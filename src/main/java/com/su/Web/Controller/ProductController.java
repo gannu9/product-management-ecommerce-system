@@ -148,6 +148,31 @@ public ResponseEntity<DashboardStats> getDashboardStats() {
 
     return ResponseEntity.ok(stats);
 }
+// Get low-stock products
+@GetMapping("/products/low-stock")
+public ResponseEntity<List<Product>> getLowStockProducts() {
 
+    List<Product> products = service.getLowStockProducts();
+
+    return ResponseEntity.ok(products);
+}
+
+// Get out-of-stock products
+@GetMapping("/products/out-of-stock")
+public ResponseEntity<List<Product>> getOutOfStockProducts() {
+
+    List<Product> products = service.getOutOfStockProducts();
+
+    return ResponseEntity.ok(products);
+}
+
+// Get in-stock products
+@GetMapping("/products/in-stock")
+public ResponseEntity<List<Product>> getInStockProducts() {
+
+    List<Product> products = service.getInStockProducts();
+
+    return ResponseEntity.ok(products);
+}
 
 }

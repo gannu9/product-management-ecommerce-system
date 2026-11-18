@@ -1,3 +1,4 @@
+
 package com.su.Web.Repository;
 
 import java.util.List;
@@ -11,9 +12,17 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     // Search products by name
     List<Product> findByProdNameContainingIgnoreCase(String keyword);
+    // Get low-stock products (quantity between 1 and 5)
+List<Product> findByQuantityBetween(int min, int max);
 
-    // Get total inventory value
-    @Query("SELECT COALESCE(SUM(p.price), 0) FROM Product p")
+// Get out-of-stock products
+List<Product> findByQuantity(int quantity);
+
+// Get in-stock products (quantity greater than 5)
+List<Product> findByQuantityGreaterThan(int quantity);
+
+    // Get total inventory value (price * quantity)
+    @Query("SELECT COALESCE(SUM(p.price * p.quantity), 0) FROM Product p")
     long getTotalInventoryValue();
 
     // Get average product price
@@ -25,6 +34,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> getHighestPricedProducts();
 
     // Get total stock units
-@Query("SELECT COALESCE(SUM(p.quantity), 0) FROM Product p")
-long getTotalStockUnits();
+    @Query("SELECT COALESCE(SUM(p.quantity), 0) FROM Product p")
+    long getTotalStockUnits();
 }

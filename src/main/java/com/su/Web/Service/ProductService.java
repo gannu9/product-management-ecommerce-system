@@ -151,4 +151,20 @@ public DashboardStats getDashboardStats() {
 public long getTotalStockUnits() {
     return repo.getTotalStockUnits();
 }
+
+// Get low-stock products
+public List<Product> getLowStockProducts() {
+    return repo.findByQuantityBetween(1, 5);
+}
+
+// Get out-of-stock products
+public List<Product> getOutOfStockProducts() {
+    return repo.findByQuantity(0);
+}
+
+// Get in-stock products
+public List<Product> getInStockProducts() {
+    return repo.findByQuantityGreaterThan(5);
+}
+
 }
