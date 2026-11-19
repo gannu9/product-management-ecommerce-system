@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import com.su.Web.Model.DashboardStats;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -166,5 +167,56 @@ public List<Product> getOutOfStockProducts() {
 public List<Product> getInStockProducts() {
     return repo.findByQuantityGreaterThan(5);
 }
+   // Add stock to an existing product
+@Transactional
+public Product addStock(int prodId, int quantity) {
 
+    if (quantity <= 0) {
+        throw new IllegalArgumentException(
+                "Stock quantity must be greater than zero"
+        );
+    }
+
+    Product product = repo.findByIdWithLock(prodId)
+            .orElseThrow(() -> new ProductNotFoundException(
+                    "Product not found with ID: " + prodId
+            ));
+
+    if (quantity > Integer.MAX_VALUE - product.getQuantity()) {
+        throw new IllegalArgumentException(
+                "Stock quantity exceeds the maximum allowed value"
+        );
+    }
+
+    product.setQuantity(product.getQuantity() + quantity);
+
+    return repo.save(product);
+}
+
+// Reduce stock from an existing product
+@Transactional
+public Product reduceStock(int prodId, int quantity) {
+
+    if (quantity <= 0) {
+        throw new IllegalArgumentException(
+                "Stock quantity must be greater than zero"
+        );
+    }
+
+    Product product = repo.findByIdWithLock(prodId)
+            .orElseThrow(() -> new ProductNotFoundException(
+                    "Product not found with ID: " + prodId
+            ));
+
+    if (product.getQuantity() < quantity) {
+        throw new IllegalArgumentException(
+                "Insufficient stock. Available quantity: "
+                + product.getQuantity()
+        );
+    }
+
+    product.setQuantity(product.getQuantity() - quantity);
+
+    return repo.save(product);
+}
 }

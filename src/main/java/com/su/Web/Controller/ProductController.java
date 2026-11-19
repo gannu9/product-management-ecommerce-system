@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 import jakarta.validation.Valid;
 
@@ -173,6 +174,27 @@ public ResponseEntity<List<Product>> getInStockProducts() {
     List<Product> products = service.getInStockProducts();
 
     return ResponseEntity.ok(products);
+}
+// Add stock to a product
+@PatchMapping("/products/{prodId}/add-stock")
+public ResponseEntity<Product> addStock(
+        @PathVariable int prodId,
+        @RequestParam int quantity) {
+
+    Product updatedProduct = service.addStock(prodId, quantity);
+
+    return ResponseEntity.ok(updatedProduct);
+}
+
+// Reduce stock from a product
+@PatchMapping("/products/{prodId}/reduce-stock")
+public ResponseEntity<Product> reduceStock(
+        @PathVariable int prodId,
+        @RequestParam int quantity) {
+
+    Product updatedProduct = service.reduceStock(prodId, quantity);
+
+    return ResponseEntity.ok(updatedProduct);
 }
 
 }

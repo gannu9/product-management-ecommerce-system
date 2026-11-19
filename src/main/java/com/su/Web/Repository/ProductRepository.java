@@ -5,6 +5,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.repository.query.Param;
+import java.util.Optional;
 
 import com.su.Web.Model.Product;
 
@@ -12,6 +16,12 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     // Search products by name
     List<Product> findByProdNameContainingIgnoreCase(String keyword);
+
+    // Lock product row during stock adjustment
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+@Query("SELECT p FROM Product p WHERE p.prodId = :prodId")
+Optional<Product> findByIdWithLock(@Param("prodId") Integer prodId);
+
     // Get low-stock products (quantity between 1 and 5)
 List<Product> findByQuantityBetween(int min, int max);
 
