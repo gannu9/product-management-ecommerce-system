@@ -4,36 +4,32 @@ import './App.css'
 
 import ProductForm from './components/ProductForm'
 import ProductList from './components/ProductList'
+import Dashboard from './components/Dashboard'
+import productService from './services/productService'
 
 function App() {
+  const [activeView, setActiveView] = useState('dashboard')
+
   // Product states
   const [products, setProducts] = useState([])
 
   const [prodId, setProdId] = useState('')
   const [prodName, setProdName] = useState('')
   const [price, setPrice] = useState('')
+  const [quantity, setQuantity] = useState('')
 
   const [isEditing, setIsEditing] = useState(false)
 
   // Search state
   const [searchTerm, setSearchTerm] = useState('')
 
-  const API_URL = 'http://localhost:8080/products'
-
   // Fetch all products
   const fetchProducts = async () => {
     try {
-      const response = await fetch(API_URL)
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch products')
-      }
-
-      const data = await response.json()
-      setProducts(data)
-
+      const response = await productService.getAllProducts()
+      setProducts(response.data)
     } catch (error) {
-      console.error(error)
+      console.error('Error fetching products:', error)
       alert('Could not load products')
     }
   }
@@ -47,6 +43,7 @@ function App() {
     setProdId('')
     setProdName('')
     setPrice('')
+    setQuantity('')
     setIsEditing(false)
   }
 
@@ -56,38 +53,29 @@ function App() {
 
     const newProduct = {
       prodId: Number(prodId),
-      prodName,
-      price: Number(price)
+      prodName: prodName.trim(),
+      price: Number(price),
+      quantity: Number(quantity)
     }
 
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newProduct)
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to add product')
-      }
+      await productService.addProduct(newProduct)
 
       alert('Product added successfully!')
       clearForm()
       await fetchProducts()
-
     } catch (error) {
-      console.error(error)
-      alert('Error adding product')
+      console.error('Error adding product:', error)
+      alert(error.response?.data?.message || 'Error adding product')
     }
   }
 
   // Select product for editing
   const selectProduct = (product) => {
-    setProdId(product.prodId)
+    setProdId(String(product.prodId))
     setProdName(product.prodName)
-    setPrice(product.price)
+    setPrice(String(product.price))
+    setQuantity(String(product.quantity))
     setIsEditing(true)
   }
 
@@ -97,30 +85,20 @@ function App() {
 
     const updatedProduct = {
       prodId: Number(prodId),
-      prodName,
-      price: Number(price)
+      prodName: prodName.trim(),
+      price: Number(price),
+      quantity: Number(quantity)
     }
 
     try {
-      const response = await fetch(API_URL, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedProduct)
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to update product')
-      }
+      await productService.updateProduct(updatedProduct)
 
       alert('Product updated successfully!')
       clearForm()
       await fetchProducts()
-
     } catch (error) {
-      console.error(error)
-      alert('Error updating product')
+      console.error('Error updating product:', error)
+      alert(error.response?.data?.message || 'Error updating product')
     }
   }
 
@@ -133,27 +111,68 @@ function App() {
     if (!confirmDelete) return
 
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE'
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to delete product')
-      }
+      await productService.deleteProduct(id)
 
       alert('Product deleted successfully!')
 
-      if (Number(prodId) === id) {
+      if (Number(prodId) === Number(id)) {
         clearForm()
       }
 
       await fetchProducts()
-
     } catch (error) {
-      console.error(error)
-      alert('Error deleting product')
+      console.error('Error deleting product:', error)
+      alert(error.response?.data?.message || 'Error deleting product')
     }
   }
+
+
+  // Add stock to a product
+  const handleAddStock = async (id) => {
+    const input = window.prompt('Enter quantity to add:')
+
+    if (input === null) return
+
+    const quantity = Number(input)
+
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      alert('Please enter a valid positive whole number.')
+      return
+    }
+
+    try {
+      await productService.addStock(id, quantity)
+      alert('Stock added successfully!')
+      await fetchProducts()
+    } catch (error) {
+      console.error('Error adding stock:', error)
+      alert(error.response?.data?.message || 'Error adding stock')
+    }
+  }
+
+  // Reduce stock from a product
+  const handleReduceStock = async (id) => {
+    const input = window.prompt('Enter quantity to reduce:')
+
+    if (input === null) return
+
+    const quantity = Number(input)
+
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      alert('Please enter a valid positive whole number.')
+      return
+    }
+
+    try {
+      await productService.reduceStock(id, quantity)
+      alert('Stock reduced successfully!')
+      await fetchProducts()
+    } catch (error) {
+      console.error('Error reducing stock:', error)
+      alert(error.response?.data?.message || 'Error reducing stock')
+    }
+  }
+
 
   // Filter products based on search
   const filteredProducts = products.filter((product) => {
@@ -167,37 +186,108 @@ function App() {
   })
 
   return (
-    <div>
-      <h1>Product Management System</h1>
+    <div className="app-layout">
 
-      {/* Search section */}
-      <input
-        type="text"
-        placeholder="Search by ID, name or price..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div className="sidebar-brand">
+          Product Admin
+        </div>
 
-      {/* Product form */}
-      <ProductForm
-        prodId={prodId}
-        setProdId={setProdId}
-        prodName={prodName}
-        setProdName={setProdName}
-        price={price}
-        setPrice={setPrice}
-        handleAdd={handleAdd}
-        handleUpdate={handleUpdate}
-        isEditing={isEditing}
-        clearForm={clearForm}
-      />
+        <p className="sidebar-label">MAIN MENU</p>
 
-      {/* Product list */}
-      <ProductList
-        products={filteredProducts}
-        selectProduct={selectProduct}
-        handleDelete={handleDelete}
-      />
+        <nav className="sidebar-nav">
+          <button
+            className={activeView === 'dashboard' ? 'active' : ''}
+            onClick={() => setActiveView('dashboard')}
+          >
+            Dashboard
+          </button>
+
+          <button
+            className={activeView === 'products' ? 'active' : ''}
+            onClick={() => setActiveView('products')}
+          >
+            Products
+          </button>
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <main className="main-content">
+
+        {activeView === 'dashboard' && (
+          <Dashboard />
+        )}
+
+        {activeView === 'products' && (
+          <>
+            <div className="dashboard-header">
+              <div>
+                <h1>Product Management</h1>
+                <p>Manage your products and inventory.</p>
+              </div>
+            </div>
+
+            {/* Search section */}
+            <div className="dashboard-section">
+              <div className="section-heading">
+                <h2>Search Products</h2>
+              </div>
+
+              <input
+                className="search-input"
+                type="text"
+                placeholder="Search by ID, name or price..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {/* Product form */}
+            <div className="dashboard-section">
+              <div className="section-heading">
+                <h2>
+                  {isEditing ? 'Update Product' : 'Add New Product'}
+                </h2>
+              </div>
+
+              <ProductForm
+                prodId={prodId}
+                setProdId={setProdId}
+                prodName={prodName}
+                setProdName={setProdName}
+                price={price}
+                setPrice={setPrice}
+                quantity={quantity}
+                setQuantity={setQuantity}
+                handleAdd={handleAdd}
+                handleUpdate={handleUpdate}
+                isEditing={isEditing}
+                clearForm={clearForm}
+              />
+            </div>
+
+            {/* Product list */}
+            <div className="dashboard-section">
+              <div className="section-heading">
+                <h2>All Products ({filteredProducts.length})</h2>
+              </div>
+
+              <div className="table-wrapper">
+              <ProductList
+  products={filteredProducts}
+  selectProduct={selectProduct}
+  handleDelete={handleDelete}
+  handleAddStock={handleAddStock}
+  handleReduceStock={handleReduceStock}
+/>
+              </div>
+            </div>
+          </>
+        )}
+
+      </main>
     </div>
   )
 }
