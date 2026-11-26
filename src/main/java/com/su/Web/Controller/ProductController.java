@@ -26,7 +26,12 @@ import com.su.Web.Model.Product;
 import com.su.Web.Service.ProductService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:5176"
+})
 public class ProductController {
 
     private final ProductService service;
@@ -107,7 +112,14 @@ public ResponseEntity<Page<Product>> getProductsWithPaginationAndSorting(
     return ResponseEntity.ok(products);
 }
 
+// Get products for the customer catalogue
+@GetMapping("/customer/products")
+public ResponseEntity<List<Product>> getCustomerCatalogue() {
 
+    List<Product> products = service.getCustomerCatalogue();
+
+    return ResponseEntity.ok(products);
+}
    
     // Add a new product
     @PostMapping("/products")

@@ -15,7 +15,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -66,7 +68,7 @@ private ProductService service;
 
         verify(service).getProduct();
     }
-
+   
     // Test 2: GET product by ID
     @Test
     void getProductByIdSuccessfully() throws Exception {

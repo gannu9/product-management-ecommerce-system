@@ -51,3 +51,12 @@ product-frontend/dist/
 
 # macOS Finder saved-search metadata
 **/myDocuments.cannedSearch/
+# Environment secrets
+.env
+.env.*
+
+# Allow example configuration
+!.env.example
+
+# Build output
+target/

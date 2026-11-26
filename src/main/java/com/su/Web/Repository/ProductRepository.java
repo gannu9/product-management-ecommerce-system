@@ -31,6 +31,8 @@ List<Product> findByQuantity(int quantity);
 // Get in-stock products (quantity greater than 5)
 List<Product> findByQuantityGreaterThan(int quantity);
 
+// Get customer catalogue products (quantity greater than 0)
+List<Product> findByQuantityGreaterThanOrderByProdNameAsc(int quantity);
     // Get total inventory value (price * quantity)
     @Query("SELECT COALESCE(SUM(p.price * p.quantity), 0) FROM Product p")
     long getTotalInventoryValue();

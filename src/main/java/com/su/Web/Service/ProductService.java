@@ -167,6 +167,11 @@ public List<Product> getOutOfStockProducts() {
 public List<Product> getInStockProducts() {
     return repo.findByQuantityGreaterThan(5);
 }
+
+// Get products available for the customer catalogue
+public List<Product> getCustomerCatalogue() {
+    return repo.findByQuantityGreaterThanOrderByProdNameAsc(0);
+}
    // Add stock to an existing product
 @Transactional
 public Product addStock(int prodId, int quantity) {

@@ -58,4 +58,20 @@ public ResponseEntity<Map<String, Object>> handleIllegalArgument(
             .status(HttpStatus.BAD_REQUEST)
             .body(response);
 }
+
+    // Handle unexpected server errors
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleUnexpectedException(
+            Exception ex) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.put("message", "An unexpected error occurred");
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(response);
+    }
+
 }

@@ -5,6 +5,9 @@ import './App.css'
 import ProductForm from './components/ProductForm'
 import ProductList from './components/ProductList'
 import Dashboard from './components/Dashboard'
+import CustomerCatalogue from './components/CustomerCatalogue'
+import AdminOrders from './components/AdminOrders'
+
 import productService from './services/productService'
 
 function App() {
@@ -12,11 +15,14 @@ function App() {
 
   // Product states
   const [products, setProducts] = useState([])
-
   const [prodId, setProdId] = useState('')
   const [prodName, setProdName] = useState('')
   const [price, setPrice] = useState('')
   const [quantity, setQuantity] = useState('')
+  const [category, setCategory] = useState('')
+  const [description, setDescription] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
+  const [features, setFeatures] = useState('')
 
   const [isEditing, setIsEditing] = useState(false)
 
@@ -44,6 +50,10 @@ function App() {
     setProdName('')
     setPrice('')
     setQuantity('')
+    setCategory('')
+    setDescription('')
+    setImageUrl('')
+    setFeatures('')
     setIsEditing(false)
   }
 
@@ -55,7 +65,11 @@ function App() {
       prodId: Number(prodId),
       prodName: prodName.trim(),
       price: Number(price),
-      quantity: Number(quantity)
+      quantity: Number(quantity),
+      category,
+      description,
+      imageUrl,
+      features
     }
 
     try {
@@ -76,6 +90,10 @@ function App() {
     setProdName(product.prodName)
     setPrice(String(product.price))
     setQuantity(String(product.quantity))
+    setCategory(product.category || '')
+    setDescription(product.description || '')
+    setImageUrl(product.imageUrl || '')
+    setFeatures(product.features || '')
     setIsEditing(true)
   }
 
@@ -87,7 +105,11 @@ function App() {
       prodId: Number(prodId),
       prodName: prodName.trim(),
       price: Number(price),
-      quantity: Number(quantity)
+      quantity: Number(quantity),
+      category,
+      description,
+      imageUrl,
+      features
     }
 
     try {
@@ -126,22 +148,21 @@ function App() {
     }
   }
 
-
   // Add stock to a product
   const handleAddStock = async (id) => {
     const input = window.prompt('Enter quantity to add:')
 
     if (input === null) return
 
-    const quantity = Number(input)
+    const stockQuantity = Number(input)
 
-    if (!Number.isInteger(quantity) || quantity <= 0) {
+    if (!Number.isInteger(stockQuantity) || stockQuantity <= 0) {
       alert('Please enter a valid positive whole number.')
       return
     }
 
     try {
-      await productService.addStock(id, quantity)
+      await productService.addStock(id, stockQuantity)
       alert('Stock added successfully!')
       await fetchProducts()
     } catch (error) {
@@ -156,15 +177,15 @@ function App() {
 
     if (input === null) return
 
-    const quantity = Number(input)
+    const stockQuantity = Number(input)
 
-    if (!Number.isInteger(quantity) || quantity <= 0) {
+    if (!Number.isInteger(stockQuantity) || stockQuantity <= 0) {
       alert('Please enter a valid positive whole number.')
       return
     }
 
     try {
-      await productService.reduceStock(id, quantity)
+      await productService.reduceStock(id, stockQuantity)
       alert('Stock reduced successfully!')
       await fetchProducts()
     } catch (error) {
@@ -172,7 +193,6 @@ function App() {
       alert(error.response?.data?.message || 'Error reducing stock')
     }
   }
-
 
   // Filter products based on search
   const filteredProducts = products.filter((product) => {
@@ -187,7 +207,6 @@ function App() {
 
   return (
     <div className="app-layout">
-
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-brand">
@@ -210,12 +229,25 @@ function App() {
           >
             Products
           </button>
+
+          <button
+            className={activeView === 'orders' ? 'active' : ''}
+            onClick={() => setActiveView('orders')}
+          >
+            Orders
+          </button>
+
+          <button
+            className={activeView === 'catalogue' ? 'active' : ''}
+            onClick={() => setActiveView('catalogue')}
+          >
+            Customer Catalogue
+          </button>
         </nav>
       </aside>
 
       {/* Main content */}
       <main className="main-content">
-
         {activeView === 'dashboard' && (
           <Dashboard />
         )}
@@ -261,6 +293,14 @@ function App() {
                 setPrice={setPrice}
                 quantity={quantity}
                 setQuantity={setQuantity}
+                category={category}
+                setCategory={setCategory}
+                description={description}
+                setDescription={setDescription}
+                imageUrl={imageUrl}
+                setImageUrl={setImageUrl}
+                features={features}
+                setFeatures={setFeatures}
                 handleAdd={handleAdd}
                 handleUpdate={handleUpdate}
                 isEditing={isEditing}
@@ -275,21 +315,31 @@ function App() {
               </div>
 
               <div className="table-wrapper">
-              <ProductList
-  products={filteredProducts}
-  selectProduct={selectProduct}
-  handleDelete={handleDelete}
-  handleAddStock={handleAddStock}
-  handleReduceStock={handleReduceStock}
-/>
+                <ProductList
+                  products={filteredProducts}
+                  selectProduct={selectProduct}
+                  handleDelete={handleDelete}
+                  handleAddStock={handleAddStock}
+                  handleReduceStock={handleReduceStock}
+                />
               </div>
             </div>
           </>
         )}
 
+        {/* Admin Orders */}
+        {activeView === 'orders' && (
+          <AdminOrders />
+        )}
+
+        {/* Customer Catalogue */}
+        {activeView === 'catalogue' && (
+          <CustomerCatalogue />
+        )}
       </main>
     </div>
   )
 }
 
 export default App
+

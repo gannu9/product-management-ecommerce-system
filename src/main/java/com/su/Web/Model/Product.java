@@ -4,6 +4,8 @@ package com.su.Web.Model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +13,6 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "products")
-
 public class Product {
 
     @Id
@@ -28,18 +29,32 @@ public class Product {
     private int price;
 
     @Min(value = 0, message = "Quantity cannot be negative")
-private int quantity;
+    private int quantity;
 
+    // New customer catalogue fields
+    private String category;
+
+    @Column(length = 1000)
+    private String description;
+
+    private String imageUrl;
+
+    @Column(length = 2000)
+    private String features;
+
+    // Default constructor
     public Product() {
     }
 
-    public Product(Integer prodId, String prodName, int price,int quantity) {
+    // Existing constructor - preserves compatibility
+    public Product(Integer prodId, String prodName, int price, int quantity) {
         this.prodId = prodId;
         this.prodName = prodName;
         this.price = price;
         this.quantity = quantity;
     }
 
+    // Product ID
     public Integer getProdId() {
         return prodId;
     }
@@ -48,6 +63,7 @@ private int quantity;
         this.prodId = prodId;
     }
 
+    // Product name
     public String getProdName() {
         return prodName;
     }
@@ -56,6 +72,7 @@ private int quantity;
         this.prodName = prodName;
     }
 
+    // Product price
     public int getPrice() {
         return price;
     }
@@ -64,11 +81,48 @@ private int quantity;
         this.price = price;
     }
 
+    // Product quantity
     public int getQuantity() {
         return quantity;
     }
-    
+
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    // Product category
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    // Product description
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    // Product image URL
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    // Product features
+    public String getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(String features) {
+        this.features = features;
     }
 }

@@ -1,0 +1,13 @@
+.git
+.vscode
+.env
+.env.*
+!.env.example
+
+target/
+product-frontend/node_modules/
+product-frontend/dist/
+product-frontend/.git/
+
+*.log
+.DS_Store
