@@ -270,3 +270,18 @@ Potential improvements may include additional automated tests, enhanced customer
 **Gagan Sharma**
 
 GitHub: [gannu9](https://github.com/gannu9)
+
+
+## Screenshots
+
+### Admin Dashboard
+![Admin Dashboard](product-frontend/public/screenshots/dashboard.png)
+
+### Product Management
+![Product Management](product-frontend/public/screenshots/products.png)
+
+### Order Management
+![Order Management](product-frontend/public/screenshots/orders.png)
+
+### Customer Catalogue
+![Customer Catalogue](product-frontend/public/screenshots/catalogue.png)
