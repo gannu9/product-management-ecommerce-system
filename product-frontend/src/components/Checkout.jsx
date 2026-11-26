@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 
-const API_URL = 'http://localhost:8080/api/orders/checkout'
+const API_URL = 'https://product-management-ecommerce-system-production.up.railway.app/api/orders/checkout'
 
 function Checkout({ cartItems, onBack, onOrderSuccess }) {
   const [form, setForm] = useState({
