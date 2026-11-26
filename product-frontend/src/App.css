@@ -710,3 +710,120 @@ tr:hover {
   }
 }
 
+
+/* ==============================
+   ADMIN LOGIN FORM
+============================== */
+
+form:has(#admin-username) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  gap: 20px;
+
+  width: 100%;
+  max-width: 520px;
+  box-sizing: border-box;
+  margin: 0 auto;
+
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+form:has(#admin-username) label {
+  display: block;
+  margin-bottom: 8px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+form:has(#admin-username) input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
+  padding: 14px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+form:has(#admin-username) input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+form:has(#admin-username) button[type="submit"] {
+  align-self: flex-start;
+  width: auto;
+  min-width: 140px;
+  min-height: 48px;
+
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+form:has(#admin-username) button[type="submit"]:hover {
+  background: #1d4ed8;
+  opacity: 1;
+}
+
+form:has(#admin-username) button[type="submit"]:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* ==============================
+   ADMIN SIDEBAR LOGOUT BUTTON
+============================== */
+
+.sidebar > button {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 12px;
+
+  padding: 10px 14px;
+  border: 1px solid #334155;
+  border-radius: 8px;
+
+  background: #1e40af;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.sidebar > button:hover {
+  background: #2563eb;
+  opacity: 1;
+}
+
+/* ==============================
+   RESPONSIVE ADMIN LOGIN
+============================== */
+
+@media (max-width: 600px) {
+  form:has(#admin-username) {
+    padding: 20px;
+  }
+
+  form:has(#admin-username) button[type="submit"] {
+    width: 100%;
+  }
+}

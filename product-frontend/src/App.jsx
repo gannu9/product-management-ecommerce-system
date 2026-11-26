@@ -8,10 +8,20 @@ import Dashboard from './components/Dashboard'
 import CustomerCatalogue from './components/CustomerCatalogue'
 import AdminOrders from './components/AdminOrders'
 
-import productService from './services/productService'
+import productService, {
+  setAdminCredentials,
+  clearAdminCredentials
+} from './services/productService'
 
 function App() {
   const [activeView, setActiveView] = useState('dashboard')
+
+  // Admin authentication states
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
+  const [loginUsername, setLoginUsername] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [loginError, setLoginError] = useState('')
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
 
   // Product states
   const [products, setProducts] = useState([])
@@ -43,6 +53,44 @@ function App() {
   useEffect(() => {
     fetchProducts()
   }, [])
+
+  // Admin login
+  const handleAdminLogin = async (e) => {
+    e.preventDefault()
+
+    setLoginError('')
+    setIsLoggingIn(true)
+
+    try {
+      // Store credentials in memory for admin API requests
+      setAdminCredentials(loginUsername.trim(), loginPassword)
+
+      // Verify credentials using a protected endpoint
+      await productService.getAllOrders()
+
+      // Login successful
+      setIsAdminLoggedIn(true)
+      setLoginPassword('')
+    } catch (error) {
+      console.error('Admin login failed:', error)
+
+      clearAdminCredentials()
+      setLoginError('Invalid username or password.')
+    } finally {
+      setIsLoggingIn(false)
+    }
+  }
+
+  // Admin logout
+  const handleAdminLogout = () => {
+    clearAdminCredentials()
+
+    setIsAdminLoggedIn(false)
+    setLoginUsername('')
+    setLoginPassword('')
+    setLoginError('')
+    setActiveView('dashboard')
+  }
 
   // Clear form
   const clearForm = () => {
@@ -205,6 +253,74 @@ function App() {
     )
   })
 
+  // Show admin login before rendering the admin panel
+  if (!isAdminLoggedIn) {
+    return (
+      <div
+        style={{
+          maxWidth: '400px',
+          margin: '80px auto',
+          padding: '24px',
+          border: '1px solid #ddd',
+          borderRadius: '12px'
+        }}
+      >
+        <h1>Admin Login</h1>
+        <p>Sign in to manage products and orders.</p>
+
+        <form onSubmit={handleAdminLogin}>
+          <div style={{ marginBottom: '16px' }}>
+            <label htmlFor="admin-username">Username</label>
+
+            <input
+              id="admin-username"
+              type="text"
+              value={loginUsername}
+              onChange={(e) => setLoginUsername(e.target.value)}
+              autoComplete="username"
+              required
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '10px',
+                marginTop: '6px'
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label htmlFor="admin-password">Password</label>
+
+            <input
+              id="admin-password"
+              type="password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '10px',
+                marginTop: '6px'
+              }}
+            />
+          </div>
+
+          {loginError && (
+            <p role="alert" style={{ color: 'red' }}>
+              {loginError}
+            </p>
+          )}
+
+          <button type="submit" disabled={isLoggingIn}>
+            {isLoggingIn ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+      </div>
+    )
+  }
+
   return (
     <div className="app-layout">
       {/* Sidebar */}
@@ -212,6 +328,14 @@ function App() {
         <div className="sidebar-brand">
           Product Admin
         </div>
+
+        <button
+          type="button"
+          onClick={handleAdminLogout}
+          style={{ margin: '12px' }}
+        >
+          Logout
+        </button>
 
         <p className="sidebar-label">MAIN MENU</p>
 
@@ -342,4 +466,5 @@ function App() {
 }
 
 export default App
+
 
